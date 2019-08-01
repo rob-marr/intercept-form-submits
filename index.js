@@ -1,8 +1,10 @@
+/* global FormData */
+
 /**
  * Intercepts clicks on a given element
  *
  */
-var Interceptor = module.exports = function interceptClicks (el, opts, cb) {
+var Interceptor = module.exports = function interceptSubmits (el, opts, cb) {
 	// Options and element are optional
 	if (typeof el === 'function') {
 		cb = el;
@@ -26,14 +28,14 @@ var Interceptor = module.exports = function interceptClicks (el, opts, cb) {
 	}
 
 	// Create click callback
-	var clickCb = Interceptor.onClick(opts, cb);
+	var submitCb = Interceptor.onSubmit(opts, cb);
 
 	// Bind the event
-	el.addEventListener('click', clickCb, false);
+	el.addEventListener('submit', submitCb, false);
 
 	// Returns the off function
 	return function () {
-		el.removeEventListener('click', clickCb, false);
+		el.removeEventListener('submit', submitCb, false);
 	};
 };
 
@@ -43,7 +45,7 @@ var Interceptor = module.exports = function interceptClicks (el, opts, cb) {
  * @function onClick
  * @param {Event} e
  */
-Interceptor.onClick = function (opts, cb) {
+Interceptor.onSubmit = function (opts, cb) {
 	// Options are optional
 	if (typeof opts === 'function') {
 		cb = opts;
@@ -55,14 +57,14 @@ Interceptor.onClick = function (opts, cb) {
 		return;
 	}
 
-	// Default optsions to true
+	// Default options to true
 	[
-		'modifierKeys',
-		'download',
-		'target',
-		'hash',
+		'dialog',
+		'get',
+		'post',
 		'mailTo',
-		'sameOrigin'
+		'sameOrigin',
+		'target'
 	].forEach(function (key) {
 		opts[key] = typeof opts[key] !== 'undefined' ? opts[key] : true;
 	});
@@ -72,13 +74,8 @@ Interceptor.onClick = function (opts, cb) {
 		// Cross browser event
 		e = e || window.event;
 
-		// Check if we are a click we should ignore
-		if (opts.modifierKeys && (Interceptor.which(e) !== 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.defaultPrevented)) {
-			return;
-		}
-
-		// Find link up the dom tree
-		var el = Interceptor.isLink(e.target);
+		// Find form up the dom tree
+		const el = Interceptor.isForm(e.target);
 
 		//
 		// Ignore if tag has
@@ -89,49 +86,63 @@ Interceptor.onClick = function (opts, cb) {
 			return;
 		}
 
-		// 2. "download" attribute
-		if (opts.download && el.getAttribute('download')) {
-			return;
-		}
-
-		// 3. rel="external" attribute
+		// 2. rel="external" attribute
 		if (opts.checkExternal && el.getAttribute('rel') === 'external') {
 			return;
 		}
 
-		// 4. target attribute
+		// 3. target attribute
 		if (opts.target && (el.target && el.target !== '_self')) {
 			return;
 		}
 
-		// Get the link href
-		var link = el.getAttribute('href');
-
-		// ensure this is not a hash for the same path
-		if (opts.hash && el.pathname === window.location.pathname && (el.hash || link === '#')) {
+		const method = el.getAttribute('method');
+		
+		if (!opts.post && method && method === 'post') {
 			return;
 		}
 
-		// Check for mailto: in the href
-		if (opts.mailTo && link && link.indexOf('mailto:') > -1) {
+		if (!opts.get && method && method === 'get') {
+			return;
+		}
+
+		if (!opts.get && method && method === 'dialog') {
+			return;
+		}
+
+		// Get the form action
+		const action = el.getAttribute('action');
+		
+		// Check for mailto: in the action
+		if (opts.mailTo && action && action.indexOf('mailto:') > -1) {
 			return;
 		}
 
 		// Only for same origin
-		if (opts.sameOrigin && !Interceptor.sameOrigin(link)) {
+		if (opts.sameOrigin && !Interceptor.sameOrigin(action)) {
 			return;
 		}
-
-		// All tests passed, intercept the link
+		e.formData = Interceptor.formDataToJSON(el);
+		// All tests passed, intercept the submit
 		cb(e, el);
 	};
 };
 
-Interceptor.isLink = function (el) {
-	while (el && el.nodeName !== 'A') {
+Interceptor.formDataToJSON = function (el) {
+	const formData = new FormData(el);
+	const json = {};
+	formData.keys().forEach(function (key) {
+		const value = FormData.getAll(key).length > 1 ? FormData.getAll(key) : FormData.get(key);
+		json[key] = value;
+	});
+	return json;
+};
+
+Interceptor.isForm = function (el) {
+	while (el && el.nodeName !== 'FORM') {
 		el = el.parentNode;
 	}
-	if (!el || el.nodeName !== 'A') {
+	if (!el || el.nodeName !== 'FORM') {
 		return;
 	}
 	return el;
@@ -149,7 +160,7 @@ Interceptor.which = function (e) {
  * Internal request
  *
  */
-Interceptor.isInternal = new RegExp('^(?:(?:http[s]?:\/\/)?' + window.location.host.replace(/\./g, '\\.') + ')?\/?[#?]?', 'i');
+Interceptor.isInternal = new RegExp('^(?:(?:http[s]?://)?' + window.location.host.replace(/\./g, '\\.') + ')?/?[#?]?', 'i');
 Interceptor.sameOrigin = function (url) {
 	return !!Interceptor.isInternal.test(url);
 };

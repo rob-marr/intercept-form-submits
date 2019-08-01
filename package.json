@@ -1,27 +1,27 @@
 {
-  "name": "intercept-link-clicks",
-  "version": "1.0.2",
-  "description": "Call a callback if the a link was clicked",
+  "name": "@robmarr/intercept-form-submits",
+  "version": "0.1.0",
+  "description": "Call a callback if a form was submitted",
   "main": "index.js",
   "scripts": {
     "test": "happiness && mochify"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:wesleytodd/intercept-link-clicks.git"
+    "url": "git@github.com:robemarr/intercept-form-submits.git"
   },
   "keywords": [
     "browser",
-    "links"
+    "forms"
   ],
-  "author": "Wes Todd",
+  "author": "Robin Marr",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/wesleytodd/intercept-link-clicks/issues"
+    "url": "https://github.com/robemarr/intercept-form-submits/issues"
   },
-  "homepage": "https://github.com/wesleytodd/intercept-link-clicks",
+  "homepage": "https://github.com/robemarr/intercept-form-submits",
   "devDependencies": {
     "mochify": "^2.14.3",
-	"happiness": "JedWatson/happiness"
+    "happiness": "^10.0.0"
   }
 }

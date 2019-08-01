@@ -1,8 +1,8 @@
 /* global describe, it, beforeEach */
-var interceptClicks = require('../');
+var interceptSubmits = require('../');
 
-describe('interceptClicks', function () {
-	var event, onClick;
+describe('interceptSubmits', function () {
+	var event, onSubmit;
 	beforeEach(function () {
 		event = {
 			which: 1,
@@ -10,92 +10,41 @@ describe('interceptClicks', function () {
 		};
 	});
 
-	it('should not intercept clicks when certain modifier keys were pressed or default was prevented', function () {
-		onClick = interceptClicks(function () {
-			throw new Error('Should not have been called!!');
-		});
-
-		onClick({
-			button: 2
-		});
-		onClick({
-			metaKey: true
-		});
-		onClick({
-			shiftKey: true
-		});
-		onClick({
-			defaultPrevented: true
-		});
-	});
-
-	it('should not intercept clicks when not on a link', function () {
-		onClick = interceptClicks(function () {
+	it('should not intercept submits when not a form', function () {
+		onSubmit = interceptSubmits(function () {
 			throw new Error('Should not have been called!!');
 		});
 
 		event.target = document.getElementsByTagName('body')[0];
 
-		onClick(event);
+		onSubmit(event);
 	});
 
-	it('should not intercept clicks when the element has download', function () {
-		onClick = interceptClicks(function () {
+	it('should not intercept submits when the element has rel', function () {
+		onSubmit = interceptSubmits(function () {
 			throw new Error('Should not have been called!!');
 		});
 
-		event.target = document.createElement('a');
-		event.target.setAttribute('download');
-
-		onClick(event);
-	});
-
-	it('should not intercept clicks when the element has rel', function () {
-		onClick = interceptClicks(function () {
-			throw new Error('Should not have been called!!');
-		});
-
-		event.target = document.createElement('a');
+		event.target = document.createElement('form');
 		event.target.setAttribute('rel', 'nofollow');
 
-		onClick(event);
+		onSubmit(event);
 	});
 
-	it('should not intercept clicks when the path is the same but the hash changed', function () {
-		onClick = interceptClicks(function () {
+	it('should not intercept submits when the action is external', function () {
+		onSubmit = interceptSubmits(function () {
 			throw new Error('Should not have been called!!');
 		});
 
-		window.location = '/';
+		event.target = document.createElement('form');
 
-		event.target = document.createElement('a');
-		event.target.setAttribute('href', '/#test');
+		event.target.setAttribute('action', 'https://tester.com');
+		onSubmit(event);
 
-		onClick(event);
-	});
+		event.target.setAttribute('action', 'http//tester.com');
+		onSubmit(event);
 
-	it('should not intercept clicks when the path is a mailto link', function () {
-		onClick = interceptClicks(function () {
-			throw new Error('Should not have been called!!');
-		});
-
-		event.target = document.createElement('a');
-		event.target.setAttribute('href', 'mailto:test@tester.com');
-
-		onClick(event);
-	});
-
-	it('should not intercept clicks when the link is to a different origin', function () {
-		onClick = interceptClicks(function () {
-			throw new Error('Should not have been called!!');
-		});
-
-		event.target = document.createElement('a');
-
-		event.target.setAttribute('href', 'http://tester.com');
-		onClick(event);
-
-		event.target.setAttribute('href', '//tester.com');
-		onClick(event);
+		event.target.setAttribute('action', '//tester.com');
+		onSubmit(event);
 	});
 });
