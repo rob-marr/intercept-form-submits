@@ -75,7 +75,7 @@ Interceptor.onSubmit = function (opts, cb) {
 		e = e || window.event;
 
 		// Find form up the dom tree
-		const el = Interceptor.isForm(e.target);
+		var el = Interceptor.isForm(e.target);
 
 		//
 		// Ignore if tag has
@@ -96,8 +96,8 @@ Interceptor.onSubmit = function (opts, cb) {
 			return;
 		}
 
-		const method = el.getAttribute('method');
-		
+		var method = el.getAttribute('method');
+
 		if (!opts.post && method && method === 'post') {
 			return;
 		}
@@ -111,8 +111,8 @@ Interceptor.onSubmit = function (opts, cb) {
 		}
 
 		// Get the form action
-		const action = el.getAttribute('action');
-		
+		var action = el.getAttribute('action');
+
 		// Check for mailto: in the action
 		if (opts.mailTo && action && action.indexOf('mailto:') > -1) {
 			return;
@@ -129,10 +129,10 @@ Interceptor.onSubmit = function (opts, cb) {
 };
 
 Interceptor.formDataToJSON = function (el) {
-	const formData = new FormData(el);
-	const json = {};
+	var formData = new FormData(el);
+	var json = {};
 	formData.keys().forEach(function (key) {
-		const value = FormData.getAll(key).length > 1 ? FormData.getAll(key) : FormData.get(key);
+		var value = FormData.getAll(key).length > 1 ? FormData.getAll(key) : FormData.get(key);
 		json[key] = value;
 	});
 	return json;
