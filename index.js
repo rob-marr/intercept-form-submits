@@ -122,20 +122,9 @@ Interceptor.onSubmit = function (opts, cb) {
 		if (opts.sameOrigin && !Interceptor.sameOrigin(action)) {
 			return;
 		}
-		e.formData = Interceptor.formDataToJSON(el);
 		// All tests passed, intercept the submit
 		cb(e, el);
 	};
-};
-
-Interceptor.formDataToJSON = function (el) {
-	var formData = new FormData(el);
-	var json = {};
-	formData.keys().forEach(function (key) {
-		var value = FormData.getAll(key).length > 1 ? FormData.getAll(key) : FormData.get(key);
-		json[key] = value;
-	});
-	return json;
 };
 
 Interceptor.isForm = function (el) {
