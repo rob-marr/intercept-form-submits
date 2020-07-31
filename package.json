@@ -4,7 +4,7 @@
   "description": "Call a callback if a form was submitted",
   "main": "index.js",
   "scripts": {
-    "test": "standard --fix && mochify"
+    "test": "standard --fix && mochify && markdownlint --fix '**/*.md'"
   },
   "repository": {
     "type": "git",
@@ -21,8 +21,9 @@
   },
   "homepage": "https://github.com/robemarr/intercept-form-submits",
   "devDependencies": {
-    "mochify": "^6.6.0",
     "eslint": "^6.0.0",
+    "markdownlint-cli": "^0.23.2",
+    "mochify": "^6.6.0",
     "standard": "^14.3.4"
   }
 }
