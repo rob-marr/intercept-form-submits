@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/robemarr/intercept-form-submits",
   "devDependencies": {
-    "mochify": "^2.14.3",
+    "mochify": "^6.6.0",
     "happiness": "^10.0.0"
   }
 }
