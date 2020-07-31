@@ -2,7 +2,7 @@
  * Intercepts clicks on a given element
  *
  */
-var Interceptor = module.exports = function interceptSubmits (el, opts, cb) {
+const Interceptor = module.exports = function interceptSubmits (el, opts, cb) {
   // Options and element are optional
   if (typeof el === 'function') {
     cb = el
@@ -26,13 +26,13 @@ var Interceptor = module.exports = function interceptSubmits (el, opts, cb) {
   }
 
   // Create submit callback
-  var submitCb = Interceptor.onSubmit(opts, cb)
+  const submitCb = Interceptor.onSubmit(opts, cb)
 
   // Bind the event
   el.addEventListener('submit', submitCb, false)
 
   // Returns the off function
-  return function () {
+  return () => {
     el.removeEventListener('submit', submitCb, false)
   }
 }
@@ -41,13 +41,12 @@ var Interceptor = module.exports = function interceptSubmits (el, opts, cb) {
  * On click handler that intercepts clicks based on options
  *
  * @function onClick
- * @param {Event} e
+ * @param {opts} opts
  */
-Interceptor.onSubmit = function (opts, cb) {
+Interceptor.onSubmit = (opts, cb) => {
   // Options are optional
   if (typeof opts === 'function') {
     cb = opts
-    opts = {}
   }
 
   // cb is required and must be a function
@@ -56,24 +55,23 @@ Interceptor.onSubmit = function (opts, cb) {
   }
 
   // Default options to true
-  [
-    'dialog',
-    'get',
-    'post',
-    'mailTo',
-    'sameOrigin',
-    'target'
-  ].forEach(function (key) {
-    opts[key] = typeof opts[key] !== 'undefined' ? opts[key] : true
-  })
+  const options = {
+    dialog: true,
+    get: true,
+    post: true,
+    mailTo: true,
+    sameOrigin: true,
+    target: true,
+    ...(opts && opts.constructor === Object ? opts : {})
+  }
 
   // Return the event handler
-  return function (e) {
+  return (e) => {
     // Cross browser event
     e = e || window.event
 
     // Find form up the dom tree
-    var el = Interceptor.isForm(e.target)
+    const el = Interceptor.findForm(e.target)
 
     //
     // Ignore if tag has
@@ -85,39 +83,37 @@ Interceptor.onSubmit = function (opts, cb) {
     }
 
     // 2. rel="external" attribute
-    if (opts.checkExternal && el.getAttribute('rel') === 'external') {
+    if (options.checkExternal && el.getAttribute('rel') === 'external') {
       return
     }
 
     // 3. target attribute
-    if (opts.target && (el.target && el.target !== '_self')) {
+    if (options.target && (el.target && el.target !== '_self')) {
       return
     }
 
-    var method = el.getAttribute('method')
+    const method = el.getAttribute('method')
 
-    if (!opts.post && method && method === 'post') {
+    // 4. the method is post and the post option is false
+    if (!options.post && method && method === 'post') {
       return
     }
 
-    if (!opts.get && method && method === 'get') {
-      return
-    }
-
-    if (!opts.get && method && method === 'dialog') {
+    // 4. the method is get or dialog and the respective option is false
+    if (!options.get && method && ['get', 'dialog'].includes(method)) {
       return
     }
 
     // Get the form action
-    var action = el.getAttribute('action')
+    const action = el.getAttribute('action')
 
     // Check for mailto: in the action
-    if (opts.mailTo && action && action.indexOf('mailto:') > -1) {
+    if (options.mailTo && action && action.indexOf('mailto:') > -1) {
       return
     }
 
     // Only for same origin
-    if (opts.sameOrigin && !Interceptor.sameOrigin(action)) {
+    if (options.sameOrigin && !Interceptor.sameOrigin(action)) {
       return
     }
     // All tests passed, intercept the submit
@@ -125,12 +121,12 @@ Interceptor.onSubmit = function (opts, cb) {
   }
 }
 
-Interceptor.isForm = function (el) {
+Interceptor.findForm = (el) => {
   while (el && el.nodeName !== 'FORM') {
     el = el.parentNode
   }
   if (!el || el.nodeName !== 'FORM') {
-    return
+    return false
   }
   return el
 }
@@ -139,7 +135,7 @@ Interceptor.isForm = function (el) {
  * Get the pressed button
  *
  */
-Interceptor.which = function (e) {
+Interceptor.which = (e) => {
   return e.which === null ? e.button : e.which
 }
 
@@ -148,6 +144,6 @@ Interceptor.which = function (e) {
  *
  */
 Interceptor.isInternal = new RegExp('^(?:(?:http[s]?://)?' + window.location.host.replace(/\./g, '\\.') + ')?/?[#?]?', 'i')
-Interceptor.sameOrigin = function (url) {
-  return !!Interceptor.isInternal.test(url)
+Interceptor.sameOrigin = (url) => {
+  return Interceptor.isInternal.test(url)
 }

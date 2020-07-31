@@ -1,17 +1,17 @@
 /* global describe, it, beforeEach */
-var interceptSubmits = require('../')
+const interceptSubmits = require('../')
 
-describe('interceptSubmits', function () {
-  var event, onSubmit
-  beforeEach(function () {
+describe('interceptSubmits', () => {
+  let event, onSubmit
+  beforeEach(() => {
     event = {
       which: 1,
-      preventDefault: function () {}
+      preventDefault: () => {}
     }
   })
 
-  it('should not intercept submits when not a form', function () {
-    onSubmit = interceptSubmits(function () {
+  it('should not intercept submits when not a form', () => {
+    onSubmit = interceptSubmits(() => {
       throw new Error('Should not have been called!!')
     })
 
@@ -20,8 +20,8 @@ describe('interceptSubmits', function () {
     onSubmit(event)
   })
 
-  it('should not intercept submits when the element has rel', function () {
-    onSubmit = interceptSubmits(function () {
+  it('should not intercept submits when the element has rel', () => {
+    onSubmit = interceptSubmits(() => {
       throw new Error('Should not have been called!!')
     })
 
@@ -31,8 +31,8 @@ describe('interceptSubmits', function () {
     onSubmit(event)
   })
 
-  it('should not intercept submits when the action is external', function () {
-    onSubmit = interceptSubmits(function () {
+  it('should not intercept submits when the action is external', () => {
+    onSubmit = interceptSubmits(() => {
       throw new Error('Should not have been called!!')
     })
 
