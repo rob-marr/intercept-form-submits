@@ -1,6 +1,6 @@
 {
   "name": "@robmarr/intercept-form-submits",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Call a callback if a form was submitted",
   "main": "index.js",
   "scripts": {
