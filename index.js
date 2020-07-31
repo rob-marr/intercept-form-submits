@@ -25,7 +25,7 @@ var Interceptor = module.exports = function interceptSubmits (el, opts, cb) {
     return
   }
 
-  // Create click callback
+  // Create submit callback
   var submitCb = Interceptor.onSubmit(opts, cb)
 
   // Bind the event
@@ -79,7 +79,7 @@ Interceptor.onSubmit = function (opts, cb) {
     // Ignore if tag has
     //
 
-    // 1. Not a link
+    // 1. Not a form
     if (!el) {
       return
     }
