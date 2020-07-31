@@ -1,5 +1,3 @@
-/* global FormData */
-
 /**
  * Intercepts clicks on a given element
  *
