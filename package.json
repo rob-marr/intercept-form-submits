@@ -4,7 +4,7 @@
   "description": "Call a callback if a form was submitted",
   "main": "index.js",
   "scripts": {
-    "test": "happiness && mochify"
+    "test": "standard --fix && mochify"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   "homepage": "https://github.com/robemarr/intercept-form-submits",
   "devDependencies": {
     "mochify": "^6.6.0",
-    "happiness": "^10.0.0"
+    "eslint": "^6.0.0",
+    "standard": "^14.3.4"
   }
 }
