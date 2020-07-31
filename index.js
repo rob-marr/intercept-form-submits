@@ -92,15 +92,10 @@ Interceptor.onSubmit = (opts, cb) => {
       return
     }
 
-    const method = el.getAttribute('method')
+    const method = el.getAttribute('method') || null
 
-    // 4. the method is post and the post option is false
-    if (!options.post && method && method === 'post') {
-      return
-    }
-
-    // 4. the method is get or dialog and the respective option is false
-    if (!options.get && method && ['get', 'dialog'].includes(method)) {
+    // 4. the option for this method is set to false
+    if (['dialog', 'get', 'post'].includes(method) && !options[method]) {
       return
     }
 
@@ -116,6 +111,7 @@ Interceptor.onSubmit = (opts, cb) => {
     if (options.sameOrigin && !Interceptor.sameOrigin(action)) {
       return
     }
+
     // All tests passed, intercept the submit
     cb(e, el)
   }
