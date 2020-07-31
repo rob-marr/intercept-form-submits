@@ -1,1 +1,3 @@
 test/
+.markdownlint.json
+.markdownlintignore
